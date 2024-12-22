@@ -5,14 +5,14 @@ import { useSelector, useDispatch } from 'react-redux';
 import { getName, getGeoLocation } from '../store/map/MapActions';
 import { setMarkerPosition } from '../store/map/MapSlice';
 import { ViewMap } from './ViewMap';
-import L from 'leaflet';  // Импортируем Leaflet для маршрута
+import L from 'leaflet';
 import 'leaflet-routing-machine';
 import 'leaflet.locatecontrol'
 import './Map.css';
 import geoLocationIcon from './icons/geoMarker.png'
 
 
-const geoIcon = L.icon({
+const geoIcon = L.icon({ // использовал собственную иконку
     iconUrl: geoLocationIcon,
     iconSize: [32, 32],
     iconAnchor: [16, 32],
@@ -26,9 +26,9 @@ const basemapsDict = {
 };
 
 export const Map = () => {
-    const [mapViewer, setMapViewer] = useState("osm");
-    const [routeMode, setRouteMode] = useState(false);  // Состояние для режима построения маршрута
-    const [routeMarkers, setRouteMarkers] = useState([]);  // Маркеры для маршрута
+    const [mapViewer, setMapViewer] = useState("osm"); // состояние карты
+    const [routeMode, setRouteMode] = useState(false);  // состояние для режима построения маршрута
+    const [routeMarkers, setRouteMarkers] = useState([]);  // маркеры для маршрута
     const [routeControl, setRouteControl] = useState(null);
     const dispatch = useDispatch();
 
@@ -122,6 +122,7 @@ export const Map = () => {
             <TileLayer url={basemapsDict[mapViewer]} />
             <ViewMap basemap={mapViewer} onChange={onBMChange} />
             
+            {/* текущее местоположение */}
             {geo && geo.position && geo.name && (
                 <Marker position={geo.position} icon={geoIcon}>
                     <Popup>
@@ -131,6 +132,7 @@ export const Map = () => {
                 </Marker>
             )}
             
+            {/* отображение конечного маркера */}
             {marker && marker.position && marker.name && (
                 <Marker position={marker.position}>
                     <Popup>

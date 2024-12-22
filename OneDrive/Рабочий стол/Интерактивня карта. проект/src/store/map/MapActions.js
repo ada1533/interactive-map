@@ -5,24 +5,25 @@ export const getName = createAsyncThunk(
   'map/getName',
   async function ({ lat, lng }, { rejectWithValue }) {
     try {
+      // запрос на сервер
       const response = await fetch(
         `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
       );
-
+      // проблема в сервере
       if (!response.ok) {
         throw new Error(`Ошибка сервера: ${response.status} ${response.statusText}`);
       }
-
+      // успешно
       const data = await response.json();
       return data.display_name || 'Не известное место';
     } catch (error) {
-      console.error('Ошибка запроса:', error);
+      // не успешно
+      console.error('ошибка запроса:', error);
 
+      // интернет
       if (error instanceof TypeError) {
-        return rejectWithValue('Ошибка сети: Проверьте подключение к интернету');
+        return rejectWithValue('ошибка сети: Проверьте интернет');
       }
-
-      // return rejectWithValue(`Произошла ошибка: ${error.message || 'Неизвестная ошибка'}`);
     }
   }
 );
@@ -31,23 +32,23 @@ export const getGeoLocation = () => async (dispatch) => {
   if ("geolocation" in navigator) { // проверка доступности геолокации
       navigator.geolocation.getCurrentPosition( // запрос на геолокацию
           async (position) => {
-              const { latitude, longitude } = position.coords;
+              const { latitude, longitude } = position.coords; // деструкторизация
               const geoPosition = [latitude, longitude];
               try {
                   const name = await dispatch(getName({ lat: latitude, lng: longitude })).unwrap();
                   dispatch(setGeoLocation({ position: geoPosition, name }));
               } catch (error) {
-                  console.error("Ошибка: ", error);
-                  dispatch(setGeoLocation({ position: geoPosition, name: '' })); // Сохраняем пустое имя при ошибке
+                  console.error("ошибка: ", error);
+                  dispatch(setGeoLocation({ position: geoPosition, name: '' })); // сохраняем пустое имя при ошибке
               }
           },
           (error) => {
-              console.error("Ошибка в координатах: ", error);
+              console.error("ошибка в координатах: ", error);
               dispatch(setGeoLocation({ position: null, name: '' })); // При ошибке координаты отсутствуют
           }
       );
   } else {
-      console.warn("Браузер не поддерживает геолокацию.");
+      console.warn("браузер не поддерживает геолокацию.");
       dispatch(setGeoLocation({ position: null, name: '' })); // Если геолокация не поддерживается
   }
 };

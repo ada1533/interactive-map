@@ -20,6 +20,7 @@
     color: white;
 }
 
+/* адаптивка */
 @media (max-width: 768px) {
     .basemap-selector {
         top: auto;
@@ -42,7 +43,8 @@
     margin: 5px;
 }
 
-.leaflet-control{
+/* обратился к виртуальному дому для скролла */
+.leaflet-control{ 
     overflow-y: auto;
     max-height: 500px;
     color: white;

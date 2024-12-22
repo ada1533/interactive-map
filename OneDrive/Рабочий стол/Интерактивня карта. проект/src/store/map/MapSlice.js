@@ -10,9 +10,10 @@ const initialState = {
 };
 
 const mapSlice = createSlice({
-    name: 'map',
+    name: 'map', // название среза
     initialState,
     reducers: {
+        // экшен маркера
         setMarkerPosition: (state, action) => {
             // if (!state.markerItem) {
                     state.markerItem = { position: action.payload, name: '' };
@@ -20,11 +21,13 @@ const mapSlice = createSlice({
                     // state.markerItem.position = action.payload;
                 // }
         },
+        // экщен текущего геолокации
         setGeoLocation: (state, action) => {
             state.geoPosition = { position: action.payload.position, name: action.payload.name };
         },
     },
     extraReducers: (builder) => {
+        // асинхронные экшены для взаимодействия с сервером
         builder
             .addCase(getName.pending, (state) => {
                 state.status = 'loading';
