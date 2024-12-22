@@ -13,6 +13,7 @@ const mapSlice = createSlice({
     name: 'map',
     initialState,
     reducers: {
+        // экшен для установки позиции маркера
         setMarkerPosition: (state, action) => {
             // if (!state.markerItem) {
                     state.markerItem = { position: action.payload, name: '' };
@@ -20,11 +21,13 @@ const mapSlice = createSlice({
                     // state.markerItem.position = action.payload;
                 // }
         },
+        // экшен для установки геолокации пользователя
         setGeoLocation: (state, action) => {
             state.geoPosition = { position: action.payload.position, name: action.payload.name };
         },
     },
     extraReducers: (builder) => {
+        // Обработчик для асинхронного экшена getName
         builder
             .addCase(getName.pending, (state) => {
                 state.status = 'loading';
@@ -42,5 +45,5 @@ const mapSlice = createSlice({
     },
 });
 
-export const { setMarkerPosition, setGeoLocation } = mapSlice.actions;
+export const { setMarkerPosition, setGeoLocation } = mapSlice.actions; // экспорт экшенов для использования в других частях приложения
 export default mapSlice.reducer;

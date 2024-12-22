@@ -5,14 +5,14 @@ import { useSelector, useDispatch } from 'react-redux';
 import { getName, getGeoLocation } from '../store/map/MapActions';
 import { setMarkerPosition } from '../store/map/MapSlice';
 import { ViewMap } from './ViewMap';
-import L from 'leaflet';  // Импортируем Leaflet для маршрута
+import L from 'leaflet';
 import 'leaflet-routing-machine';
 import 'leaflet.locatecontrol'
 import './Map.css';
 import geoLocationIcon from './icons/geoMarker.png'
 
 
-const geoIcon = L.icon({
+const geoIcon = L.icon({ // замена маркера на другую картинку
     iconUrl: geoLocationIcon,
     iconSize: [32, 32],
     iconAnchor: [16, 32],
@@ -26,22 +26,22 @@ const basemapsDict = {
 };
 
 export const Map = () => {
-    const [mapViewer, setMapViewer] = useState("osm");
-    const [routeMode, setRouteMode] = useState(false);  // Состояние для режима построения маршрута
-    const [routeMarkers, setRouteMarkers] = useState([]);  // Маркеры для маршрута
-    const [routeControl, setRouteControl] = useState(null);
+    const [mapViewer, setMapViewer] = useState("osm"); // состояние карты
+    const [routeMode, setRouteMode] = useState(false);  // состояние для режима построения маршрута
+    const [routeMarkers, setRouteMarkers] = useState([]);  // маркеры для маршрута
+    const [routeControl, setRouteControl] = useState(null); // управление маршрутом
     const dispatch = useDispatch();
 
     const marker = useSelector((state) => state.map.markerItem);
     const geo = useSelector((state) => state.map.geoPosition);
 
 
-    const onBMChange = (newBasemap) => {
+    const onBMChange = (newBasemap) => { // событие меняет стилизацию карты
         setMapViewer(newBasemap);
     };
 
     useEffect(() => {
-        dispatch(getGeoLocation()); // Запрашиваем координаты при загрузке компонента
+        dispatch(getGeoLocation()); // запрашиваем координаты при загрузке компонента
     }, [dispatch]);
 
     const MapClicker = () => {
@@ -49,20 +49,20 @@ export const Map = () => {
             click: (e) => {
                 const { latlng: { lat, lng }, target: map, originalEvent } = e;
     
-                // Игнорируем клики на маркерах
+                // игнорируем клики на маркерах
                 if (originalEvent.target.tagName === "IMG" || originalEvent.target.classList.contains('leaflet-marker-icon')) {
                     return;
                 }
                 if (routeMode) {
-                    // Если включен режим маршрута
+                    // если включен режим маршрута
                     const updatedMarkers = [...routeMarkers, [lat, lng]].slice(0, 2);
                     setRouteMarkers(updatedMarkers);
     
                     if (updatedMarkers.length === 2) {
-                        // Удаляем предыдущий маршрут
+                        // удаляем предыдущий маршрут
                         routeControl?.remove();
     
-                        // Создаем новый маршрут между двумя точками
+                        // создаем новый маршрут между двумя точками
                         const newRouteControl = L.Routing.control({
                             waypoints: updatedMarkers.map(([lat, lng]) => L.latLng(lat, lng)),
                             routeWhileDragging: true, // Разрешаем перетаскивание маршрута
@@ -70,31 +70,31 @@ export const Map = () => {
                         }).addTo(map);
     
                         setRouteControl(newRouteControl);
-                        setRouteMarkers([]); // Сбрасываем маркеры маршрута
-                        setRouteMode(false); // Выключаем режим маршрута
+                        setRouteMarkers([]); // сбрасываем маркеры маршрута
+                        setRouteMode(false); // выключаем режим маршрута
                     }
                 } else {
-                    // Если режим маршрута выключен
-                    dispatch(getName({ lat, lng })); // Получаем имя для новой точки
-                    dispatch(setMarkerPosition([lat, lng])); // Устанавливаем позицию конечного маркера
+                    // если режим маршрута выключен
+                    dispatch(getName({ lat, lng })); // получаем имя для новой точки
+                    dispatch(setMarkerPosition([lat, lng])); // устанавливаем позицию конечного маркера
                 
                     if (geo && geo.position) {
-                        // Если есть текущее местоположение, строим маршрут
+                        // если есть текущее местоположение, строим маршрут
                         const currentPosition = geo.position;
                 
-                        routeControl?.remove(); // Удаляем старый маршрут
+                        routeControl?.remove(); // удаляем старый маршрут
                         const newRouteControl = L.Routing.control({
                             waypoints: [L.latLng(currentPosition[0], currentPosition[1]), L.latLng(lat, lng)],
-                            routeWhileDragging: true, // Разрешаем перетаскивание маршрута
+                            routeWhileDragging: true, // разрешаем перетаскивание маршрута
                             lineOptions: { styles: [{ color: '#6FA1EC', weight: 5 }] },
-                            createMarker: () => null, // Отключаем создание маркеров
+                            createMarker: () => null, // отключает создание маркеров
                         }).addTo(map);
                 
                         setRouteControl(newRouteControl);
                     } else {
-                        // Если местоположение недоступно, просто показываем конечный маркер
+                        // если местоположение недоступно, показывается конечный маркер
                         console.warn("Геолокация недоступна.");
-                        routeControl?.remove(); // Удаляем маршрут, если он был
+                        routeControl?.remove(); // удаляем маршрут, если он был
                         setRouteControl(null);
                     }
                 }
@@ -105,9 +105,12 @@ export const Map = () => {
     };
     
 
+    // Включение режима маршрута
     const routeButton = () => {
         setRouteMode(true);
     };
+
+    // Удаление маршрута
     const deleteButton = () => {
         routeControl?.remove();
         setRouteMarkers([]);
@@ -122,6 +125,7 @@ export const Map = () => {
             <TileLayer url={basemapsDict[mapViewer]} />
             <ViewMap basemap={mapViewer} onChange={onBMChange} />
             
+            {/* Текущее местоположение */}
             {geo && geo.position && geo.name && (
                 <Marker position={geo.position} icon={geoIcon}>
                     <Popup>
@@ -131,6 +135,7 @@ export const Map = () => {
                 </Marker>
             )}
             
+            {/* Конечный маркер */}
             {marker && marker.position && marker.name && (
                 <Marker position={marker.position}>
                     <Popup>
@@ -140,6 +145,7 @@ export const Map = () => {
                 </Marker>
             )}
             
+            {/* Кнопки */}
             <div className='buttonContainer'>
                 <button className='button' onClick={routeButton}>M</button>
                 <button className='button' onClick={deleteButton}>D</button>
