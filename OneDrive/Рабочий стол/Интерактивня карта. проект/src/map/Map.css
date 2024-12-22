@@ -1,0 +1,50 @@
+/* ViewMap -------------------------------------------------------------------------------*/
+.basemap-selector {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    display: flex;
+    gap: 10px;
+    z-index: 1000;
+}
+
+.basemap-selector button {
+    background: white;
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.basemap-selector .active {
+    background: #007bff;
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .basemap-selector {
+        top: auto;
+        bottom: 10px;
+        right: 10px;
+    }
+}
+/*-------------------------------------------------------------------------------*/
+
+.buttonContainer{
+    display: flex;
+    z-index: 1000;
+    position: absolute;
+    top: 100px;
+    left: 10px;
+    flex-direction: column;
+}
+.button{
+    padding: 10px;
+    margin: 5px;
+}
+
+.leaflet-control{
+    overflow-y: auto;
+    max-height: 500px;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.463);
+}
