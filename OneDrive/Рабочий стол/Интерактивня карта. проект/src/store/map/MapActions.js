@@ -3,28 +3,15 @@ import { setGeoLocation } from './MapSlice';
 
 export const getName = createAsyncThunk(
   'map/getName',
-  async function ({ lat, lng }, { rejectWithValue }) {
-    try {
-      // запрос на сервер
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
-      );
-      // проблема в сервере
-      if (!response.ok) {
-        throw new Error(`Ошибка сервера: ${response.status} ${response.statusText}`);
-      }
-      // успешно
-      const data = await response.json();
-      return data.display_name || 'Не известное место';
-    } catch (error) {
-      // не успешно
-      console.error('ошибка запроса:', error);
-
-      // интернет
-      if (error instanceof TypeError) {
-        return rejectWithValue('ошибка сети: Проверьте интернет');
-      }
+  async function ({ lat, lng }) {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
+    );
+    if (!response.ok) {
+      throw new Error(`ошибка сервера: ${response.status}`);
     }
+    const data = await response.json();
+    return data.display_name || 'Не известное место';
   }
 );
 
@@ -37,18 +24,16 @@ export const getGeoLocation = () => async (dispatch) => {
               try {
                   const name = await dispatch(getName({ lat: latitude, lng: longitude })).unwrap();
                   dispatch(setGeoLocation({ position: geoPosition, name }));
-              } catch (error) {
-                  console.error("ошибка: ", error);
+              } catch {
                   dispatch(setGeoLocation({ position: geoPosition, name: '' })); // сохраняем пустое имя при ошибке
               }
           },
-          (error) => {
-              console.error("ошибка в координатах: ", error);
+          () => {
               dispatch(setGeoLocation({ position: null, name: '' })); // При ошибке координаты отсутствуют
           }
       );
   } else {
-      console.warn("браузер не поддерживает геолокацию.");
       dispatch(setGeoLocation({ position: null, name: '' })); // Если геолокация не поддерживается
   }
 };
+

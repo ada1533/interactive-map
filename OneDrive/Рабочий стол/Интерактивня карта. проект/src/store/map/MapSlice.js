@@ -47,3 +47,4 @@ const mapSlice = createSlice({
 
 export const { setMarkerPosition, setGeoLocation } = mapSlice.actions;
 export default mapSlice.reducer;
+
